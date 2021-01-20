@@ -1,7 +1,5 @@
-// import React, { Component } from "react";
 import React from "react";
 import Form from "../components/Form";
-// import Wrapper from "../components/Wrapper";
 import Results from "../components/Results";
 import API from "../utils/API";
 
@@ -15,10 +13,21 @@ class Search extends React.Component {
         this.searchBook();
     }
 
+    makeBook = bookData => {
+        return {
+            _id: bookData.id,
+            title: bookData.volumeInfo.title,
+            authors: bookData.volumeInfo.authors,
+            description: bookData.volumeInfo.description,
+            image: bookData.volumeInfo.imageLinks.thumbnail,
+            link: bookData.volumeInfo.previewLink
+        }
+    }
+
     searchBook = query => {
         API.getBook(query)
-            .then(res => this.setState({ books: res.data.items }))
-            .catch(err => console.log(err));
+            .then(res => this.setState({ books: res.data.items.map(bookData => this.makeBook(bookData)) }))
+            .catch(err => console.error(err));
     };
 
     handleInputChange = event => {
@@ -35,7 +44,6 @@ class Search extends React.Component {
     };
 
     render() {
-        console.log("this.state.books: " + this.state.books)
         return (
             <div>
                 <Form
@@ -43,7 +51,10 @@ class Search extends React.Component {
                     handleInputChange={this.handleInputChange}
                     handleFormSubmit={this.handleFormSubmit}
                 />
-                <Results books={this.state.books} />
+                <div className="container">
+                    <h2>Results</h2>
+                    <Results books={this.state.books} />
+                </div>
             </div>
         )
     }
